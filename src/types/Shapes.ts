@@ -1,3 +1,5 @@
+import Konva from "konva";
+
 export enum Tools {
   Grab = "Grab",
   MousePointer = "MousePointer",
@@ -20,33 +22,49 @@ export interface Placement2D {
   y: number;
 }
 
+export interface NodeOptions {
+  moveToTop: () => void;
+  moveToBottom: () => void;
+  moveUp: () => void;
+  moveDown: () => void;
+}
+
 export interface Size2D {
   width: number;
   height: number;
 }
 
-export interface CommonShape extends Placement2D {
+export interface CommonShape extends Placement2D, NodeOptions {
   id: string;
-  selected: boolean;
+  selected?: boolean;
   type: ShapeType;
 }
 
-export interface Rectangle extends CommonShape, Size2D {
+export interface ShapeStyle {
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  cornerRadius?: number;
+  text?: string;
+  fontSize?: number;
+}
+
+export interface Rectangle extends CommonShape, Size2D, ShapeStyle {
   type: ShapeType.RECTANGLE;
 }
 
-export interface Circle extends CommonShape {
+export interface Circle extends CommonShape, ShapeStyle {
   type: ShapeType.CIRCLE;
   radiusX: number;
   radiusY: number;
 }
 
-export interface Line extends CommonShape {
+export interface Line extends CommonShape, ShapeStyle {
   type: ShapeType.LINE;
   points: number[];
 }
 
-export interface Text extends CommonShape {
+export interface Text extends CommonShape, ShapeStyle {
   type: ShapeType.TEXT;
   text: string;
 }

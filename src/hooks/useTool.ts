@@ -5,8 +5,6 @@ import { useEffect } from "react";
 export const useTool = () => {
   const { currentTool, changeTool } = useCanvasStore((state) => state);
   useEffect(() => {
-    console.log("Effect");
-
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case "1":
