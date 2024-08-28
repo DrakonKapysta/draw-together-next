@@ -1,8 +1,10 @@
-import { Shape, Tools } from "@/types/Shapes";
+import { CircleHelper, RectHelper } from "@/lib/shapeHelpers";
+import { Shape, ShapeType, Tools } from "@/types/Shapes";
 import Konva from "konva";
+import { Context } from "konva/lib/Context";
 import { KonvaEventObject } from "konva/lib/Node";
 import React, { FC } from "react";
-import { Ellipse, Line, Rect, Text } from "react-konva";
+import { Ellipse, Line, Rect, Text, Group } from "react-konva";
 
 interface ShapeProps {
   currentTool: Tools;
@@ -35,11 +37,12 @@ export const Shapes: FC<ShapeProps> = ({
                 key={shape.id}
                 className={className}
                 {...props}
-                x={0}
-                y={0}
+                hitStrokeWidth={20}
+                x={shape.x}
+                y={shape.y}
               />
             );
-          case "CIRCLE":
+          case ShapeType.CIRCLE:
             return (
               <Ellipse
                 key={shape.id}
@@ -52,7 +55,14 @@ export const Shapes: FC<ShapeProps> = ({
               />
             );
           case "RECTANGLE":
-            return <Rect key={shape.id} className={className} {...props} />;
+            return (
+              <Rect
+                key={shape.id}
+                className={className}
+                {...props}
+                hitFunc={RectHelper.createHitBox}
+              />
+            );
           case "TEXT":
             return <Text key={shape.id} className={className} {...props} />;
         }

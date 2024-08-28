@@ -47,12 +47,13 @@ export const useMouseArea = ({
       if (!stage) return;
 
       const pointerPosition = getRelativePointerPosition(stage);
+      console.log("Target", event.target);
 
       if (event.target !== stage) {
         const shapeId = event.target.attrs.id;
         selectShape(shapeId);
-        shapeDragging.current = true;
-        return;
+        // shapeDragging.current = true;
+        // return;
       } else {
         selectShape("");
       }

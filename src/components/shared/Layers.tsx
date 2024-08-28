@@ -1,4 +1,8 @@
-import { handleShapeLayering } from "@/lib/handleShapeLayering";
+import {
+  handleGroupLayering,
+  handleShapeLayering,
+} from "@/lib/handleShapeLayering";
+import { useCanvasStore } from "@/stores/CanvasStore";
 import { LayersOptions } from "@/types/Layers";
 import { Shape } from "@/types/Shapes";
 import Konva from "konva";
@@ -12,6 +16,7 @@ import React, { FC } from "react";
 
 interface LayerProps {
   activeShapes?: Shape[];
+  groupRef: React.RefObject<Konva.Group>;
 }
 
 export const layerOptions = [
@@ -33,9 +38,17 @@ export const layerOptions = [
   },
 ];
 
-export const Layers: FC<LayerProps> = ({ activeShapes }) => {
+export const Layers: FC<LayerProps> = ({ activeShapes, groupRef }) => {
+  const selectedShapesCount = useCanvasStore(
+    (state) => state.selectedShapesCount
+  );
   const handleLayer = (layerOption: LayersOptions) => {
-    handleShapeLayering(activeShapes, layerOption);
+    if (selectedShapesCount > 1) {
+      console.log("groud");
+      if (groupRef.current) handleGroupLayering(groupRef.current, layerOption);
+    } else {
+      handleShapeLayering(activeShapes, layerOption);
+    }
   };
 
   return (

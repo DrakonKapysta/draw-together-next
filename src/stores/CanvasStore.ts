@@ -8,7 +8,7 @@ interface CanvasState {
   currentTool: Tools;
   changeTool: (tool: Tools) => void;
   setSelectedShape: () => void;
-  unselectShape: () => void;
+  unselectShapes: () => void;
   addShape: (shape: Shape) => void;
   deleteShape: (id: string) => void;
   deleteSelectedShapes: () => void;
@@ -16,12 +16,19 @@ interface CanvasState {
   selectShape: (id: string) => void;
   selectShapesInArea: (selectionBox: SelectionBox) => void;
   isShapeSelected: boolean;
+  selectedShapesCount: number;
+  isGroup: boolean;
+  setIsGroup: (grouped: boolean) => void;
+  updateShape: (shapeToUpdate: any) => void;
+  resetSelectedShapesCount: () => void;
 }
 
 export const useCanvasStore = create<CanvasState>()((set) => ({
   shapes: [],
   currentTool: Tools.MousePointer,
   isShapeSelected: false,
+  selectedShapesCount: 0,
+  isGroup: false,
   changeTool: (tool: Tools) =>
     set(
       produce((state) => {
@@ -34,16 +41,32 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
         return { isShapeSelected: true };
       })
     ),
-  unselectShape: () =>
+  setIsGroup: (grouped: boolean) => set({ isGroup: grouped }),
+  unselectShapes: () =>
     set(
-      produce((state) => {
-        return { isShapeSelected: false };
+      produce((state: CanvasState) => {
+        return {
+          shapes: state.shapes.map((shape) => ({ ...shape, selected: false })),
+        };
       })
     ),
   setShapes: (shapes: Shape[]) => {
     set(
       produce((state) => {
         return { shapes: shapes };
+      })
+    );
+  },
+  updateShape: (shapeToUpdate) => {
+    set(
+      produce((state: CanvasState) => {
+        return {
+          shapes: state.shapes.map((shape) => {
+            if (shape.id !== shapeToUpdate.id) {
+              return shape;
+            }
+          }),
+        };
       })
     );
   },
@@ -63,6 +86,18 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
       })
     );
   },
+
+  deleteShapes: (ids: string[]) => {
+    set(
+      produce((state) => {
+        return {
+          shapes: state.shapes.filter(
+            (shape: Shape) => !ids.includes(shape.id)
+          ),
+        };
+      })
+    );
+  },
   deleteSelectedShapes: () => {
     set(
       produce((state) => {
@@ -71,6 +106,11 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
         };
       })
     );
+  },
+  resetSelectedShapesCount: () => {
+    set({
+      selectedShapesCount: 0,
+    });
   },
   selectShape(id: string) {
     set(
@@ -86,13 +126,19 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   selectShapesInArea: (selectionBox: SelectionBox) => {
     set(
       produce((state) => {
+        let shapesCount = 0;
         return {
           shapes: state.shapes.map((shape: Shape) => {
+            const selected = isShapeSelection(shape, selectionBox);
+
+            if (selected) shapesCount++;
+
             return {
               ...shape,
-              selected: isShapeSelection(shape, selectionBox),
+              selected: selected,
             };
           }),
+          selectedShapesCount: shapesCount,
         };
       })
     );

@@ -4,26 +4,33 @@ import { Shape, ShapeStyle } from "@/types/Shapes";
 import { useState } from "react";
 import { Layers } from "./Layers";
 import ShapeActions from "./ShapeActions";
+import Konva from "konva";
+import { useCanvasStore } from "@/stores/CanvasStore";
 
 interface ShapeOptionsProps {
   style: ShapeStyle;
   onApplyStyles: (styles: Partial<ShapeStyle>) => void;
+  onStyleChange: (styles: Partial<ShapeStyle>) => void;
+  groupRef: React.RefObject<Konva.Group>;
   activeShapes: Shape[];
 }
 
 const strokeColors = ["#ffffff", "#ff8383", "#3a994c", "#56a2e8"];
-const backgroundColors = [...strokeColors, "transparent"];
-const cornerRadius = [0, 5, 10];
+const backgroundColors = [...strokeColors, ""];
+const cornerRadius = [0, 5, 10, 100];
 
 export const ShapeOptions = ({
   style,
   onApplyStyles,
+  onStyleChange,
   activeShapes,
+  groupRef,
 }: ShapeOptionsProps) => {
   const [activeButton, setActiveButton] = useState<{
     defaultCssProp: string;
     index: number;
   } | null>(null);
+  const isGroup = useCanvasStore((state) => state.isGroup);
 
   const clickButtonHandler = (
     activeButton: {
@@ -33,6 +40,7 @@ export const ShapeOptions = ({
     styles: Partial<ShapeStyle>
   ) => {
     onApplyStyles(styles);
+    onStyleChange(styles);
     setActiveButton(activeButton);
   };
 
@@ -82,11 +90,11 @@ export const ShapeOptions = ({
                       activeButton.index === index
                         ? "white"
                         : "",
-                    [option.defaultCssProp]: opt === "transparent" ? "" : opt,
+                    [option.defaultCssProp]: opt === "" ? "" : opt,
                   }}
                   className={cn(
                     `min-w-6 min-h-6 rounded border `,
-                    `${opt === "transparent" && "transparent-background"}`
+                    `${opt === "" && "transparent-background"}`
                   )}
                   onClick={() =>
                     clickButtonHandler(
@@ -99,7 +107,7 @@ export const ShapeOptions = ({
             </div>
           </div>
         ))}
-        <Layers activeShapes={activeShapes} />
+        <Layers groupRef={groupRef} activeShapes={activeShapes} />
         <ShapeActions />
       </section>
     </aside>

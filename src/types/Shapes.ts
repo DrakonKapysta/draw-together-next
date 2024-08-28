@@ -15,6 +15,7 @@ export enum ShapeType {
   CIRCLE = "CIRCLE",
   RECTANGLE = "RECTANGLE",
   TEXT = "TEXT",
+  GROUP = "GROUP",
 }
 
 export interface Placement2D {
@@ -38,6 +39,8 @@ export interface CommonShape extends Placement2D, NodeOptions {
   id: string;
   selected?: boolean;
   type: ShapeType;
+  startX: number;
+  startY: number;
 }
 
 export interface ShapeStyle {
@@ -67,6 +70,10 @@ export interface Line extends CommonShape, ShapeStyle {
 export interface Text extends CommonShape, ShapeStyle {
   type: ShapeType.TEXT;
   text: string;
+}
+
+export interface Group extends CommonShape {
+  groupShapes: Shape[];
 }
 
 export type Shape = Rectangle | Circle | Line | Text;
