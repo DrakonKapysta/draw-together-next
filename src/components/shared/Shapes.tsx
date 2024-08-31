@@ -12,12 +12,14 @@ interface ShapeProps {
   shapes: Shape[];
   onDragEnd: (e: KonvaEventObject<MouseEvent>) => void;
   className?: string;
+  trRef?: React.RefObject<Konva.Transformer>;
 }
 
 export const Shapes: FC<ShapeProps> = ({
   shapes,
   currentTool,
   onDragEnd,
+  trRef,
   className,
 }) => {
   const updateShape = useCanvasStore((state) => state.updateShape);
@@ -45,14 +47,29 @@ export const Shapes: FC<ShapeProps> = ({
                 y={shape.y}
                 onTransformStart={(e) => {}}
                 onTransformEnd={(e) => {
-                  const node = e.target.clone();
-                  const layer = node.getLayer();
+                  const node = e.target;
 
-                  if (layer) {
-                    node.destroy();
-                  }
+                  const transform = node.getTransform();
+                  const firstPoint = transform.point({
+                    x: (node as Konva.Line).points()[0],
+                    y: (node as Konva.Line).points()[1],
+                  });
+                  const secondPoint = transform.point({
+                    x: (node as Konva.Line).points()[2],
+                    y: (node as Konva.Line).points()[3],
+                  });
 
-                  updateShape(node);
+                  updateShape({
+                    id: shape.id,
+                    x: 0,
+                    y: 0,
+                    points: [
+                      firstPoint.x,
+                      firstPoint.y,
+                      secondPoint.x,
+                      secondPoint.y,
+                    ],
+                  });
                 }}
               />
             );

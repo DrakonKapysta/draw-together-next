@@ -131,6 +131,7 @@ function CanvasKonva(props: any) {
             onDragEnd={handleShapeDragEnd}
             currentTool={currentTool}
             shapes={shapes}
+            trRef={trRef}
           />
           <Group ref={groupRef} draggable preventDefault></Group>
 

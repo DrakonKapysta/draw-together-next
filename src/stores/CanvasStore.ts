@@ -24,7 +24,8 @@ interface CanvasState {
   setIsGroup: (grouped: boolean) => void;
   updateShape: (shapeToUpdate: any) => void;
   resetSelectedShapesCount: () => void;
-  trRef: RefObject<Konva.Transformer | null> | null;
+  trRef: RefObject<Konva.Transformer> | undefined;
+  setTrRef: (ref: React.RefObject<Konva.Transformer>) => void;
 }
 
 export const useCanvasStore = create<CanvasState>()((set) => ({
@@ -33,7 +34,7 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   isShapeSelected: false,
   selectedShapesCount: 0,
   isGroup: false,
-  trRef: null,
+  trRef: undefined,
   changeTool: (tool: Tools) =>
     set(
       produce((state) => {
@@ -62,27 +63,17 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
       })
     );
   },
+  setTrRef: (ref) => set({ trRef: ref }),
   updateShape: (shapeToUpdate) => {
     set(
       produce((state: CanvasState) => {
         return {
           shapes: state.shapes.map((shape) => {
-            if (shape.id === shapeToUpdate.attrs.id) {
-              console.log("suka");
-
-              const props = shapeToUpdate.getClientRect();
-              const rotation = shapeToUpdate.rotation();
+            if (shape.id === shapeToUpdate.id) {
               return {
                 ...shape,
+                ...shapeToUpdate,
                 id: v4(),
-                x: 0,
-                y: 0,
-                points: [
-                  props.x,
-                  props.y,
-                  props.x + props.width,
-                  props.y + props.height,
-                ],
               };
             }
             return shape;
