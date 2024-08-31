@@ -1,6 +1,9 @@
 import { isShapeSelection, SelectionBox } from "@/lib/isShapeSelection";
-import { Shape, Tools } from "@/types/Shapes";
+import { Line, Shape, Tools } from "@/types/Shapes";
 import { produce } from "immer";
+import Konva from "konva";
+import { RefObject } from "react";
+import { v4 } from "uuid";
 import { create } from "zustand";
 
 interface CanvasState {
@@ -21,6 +24,7 @@ interface CanvasState {
   setIsGroup: (grouped: boolean) => void;
   updateShape: (shapeToUpdate: any) => void;
   resetSelectedShapesCount: () => void;
+  trRef: RefObject<Konva.Transformer | null> | null;
 }
 
 export const useCanvasStore = create<CanvasState>()((set) => ({
@@ -29,6 +33,7 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   isShapeSelected: false,
   selectedShapesCount: 0,
   isGroup: false,
+  trRef: null,
   changeTool: (tool: Tools) =>
     set(
       produce((state) => {
@@ -62,9 +67,25 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
       produce((state: CanvasState) => {
         return {
           shapes: state.shapes.map((shape) => {
-            if (shape.id !== shapeToUpdate.id) {
-              return shape;
+            if (shape.id === shapeToUpdate.attrs.id) {
+              console.log("suka");
+
+              const props = shapeToUpdate.getClientRect();
+              const rotation = shapeToUpdate.rotation();
+              return {
+                ...shape,
+                id: v4(),
+                x: 0,
+                y: 0,
+                points: [
+                  props.x,
+                  props.y,
+                  props.x + props.width,
+                  props.y + props.height,
+                ],
+              };
             }
+            return shape;
           }),
         };
       })

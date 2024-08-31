@@ -26,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="overflow-hidden">
         <Header />
-        <main className={cn("min-h-screen  bg-gray-950", nunito.className)}>
+        <main className={cn("min-h-screen  bg-[#121212]", nunito.className)}>
           {children}
         </main>
       </body>

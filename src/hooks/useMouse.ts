@@ -69,8 +69,11 @@ export const useMouse = ({
       return;
     }
 
+    //console.log(event.target);
+
     //const pointerPosition = stage.getRelativePointerPosition(); // relative pointer position
     const { x, y } = getRelativePointerPosition(stage);
+    console.log(x, y);
 
     switch (tool) {
       case Tools.Rectangle:
@@ -114,6 +117,8 @@ export const useMouse = ({
 
       case Tools.MousePointer:
         if (event.target !== stage) {
+          const shapeName = event.target.parent?.getClassName();
+          if (shapeName === "Transformer") return;
           const children = groupRef.current?.getChildren();
           const ids = children?.map((child: any) => child.attrs.id);
 

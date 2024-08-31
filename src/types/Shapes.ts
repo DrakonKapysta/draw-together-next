@@ -37,6 +37,7 @@ export interface Size2D {
 
 export interface CommonShape extends Placement2D, NodeOptions {
   id: string;
+  oldId?: string | null;
   selected?: boolean;
   type: ShapeType;
   startX: number;

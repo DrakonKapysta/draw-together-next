@@ -1,5 +1,6 @@
 import { CircleHelper, RectHelper } from "@/lib/shapeHelpers";
-import { Shape, ShapeType, Tools } from "@/types/Shapes";
+import { useCanvasStore } from "@/stores/CanvasStore";
+import { Line as LineType, Shape, ShapeType, Tools } from "@/types/Shapes";
 import Konva from "konva";
 import { Context } from "konva/lib/Context";
 import { KonvaEventObject } from "konva/lib/Node";
@@ -19,6 +20,7 @@ export const Shapes: FC<ShapeProps> = ({
   onDragEnd,
   className,
 }) => {
+  const updateShape = useCanvasStore((state) => state.updateShape);
   const options = {
     draggable: currentTool === Tools.MousePointer,
     onDragEnd,
@@ -27,7 +29,8 @@ export const Shapes: FC<ShapeProps> = ({
     <>
       {shapes.map((shape) => {
         const activeProps = shape.selected
-          ? { shadowColor: "red", shadowBlur: 20, shadowOpacity: 100 }
+          ? // ? { shadowColor: "red", shadowBlur: 20, shadowOpacity: 100 }
+            {}
           : {};
         const props = { ...activeProps, ...shape, ...options };
         switch (shape.type) {
@@ -40,6 +43,17 @@ export const Shapes: FC<ShapeProps> = ({
                 hitStrokeWidth={20}
                 x={shape.x}
                 y={shape.y}
+                onTransformStart={(e) => {}}
+                onTransformEnd={(e) => {
+                  const node = e.target.clone();
+                  const layer = node.getLayer();
+
+                  if (layer) {
+                    node.destroy();
+                  }
+
+                  updateShape(node);
+                }}
               />
             );
           case ShapeType.CIRCLE:

@@ -168,7 +168,10 @@ export class LineHelper {
     return {
       ...defaultStyles,
       id: uuidv4(),
+      oldId: null,
       points: [x, y, x, y],
+      startX: x,
+      startY: y,
       strokeWidth: 10,
       LineCap: "round",
       stroke: "white",

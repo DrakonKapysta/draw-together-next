@@ -51,7 +51,12 @@ export default function Toolbar({ className }: { className?: string }) {
   const { currentTool, changeTool, unselectShapes } = useTool();
 
   return (
-    <menu className={cn("flex items-center h-12 pl-16", className)}>
+    <menu
+      className={cn(
+        "absolute left-1/2 -translate-x-1/2 flex items-center h-12 pl-1 z-10",
+        className
+      )}
+    >
       <div className="flex items-center justify-center gap-2 h-full rounded-lg bg-[#232329] px-4">
         {options.map((option, index) => (
           <button

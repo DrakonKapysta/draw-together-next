@@ -3,18 +3,28 @@ import { useGrabbing } from "@/hooks/useGrabbing";
 import { useMouseArea } from "@/hooks/useMouseArea";
 import { useStageScale } from "@/hooks/useStageScale";
 import { useTool } from "@/hooks/useTool";
-import { cn } from "@/lib/utils";
+import { cn, getShapeRefsFromArray } from "@/lib/utils";
 import { useCanvasStore } from "@/stores/CanvasStore";
 import { Shape, ShapeStyle, ShapeType, Tools } from "@/types/Shapes";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Stage, Layer, Circle, Text, Rect, Group } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Circle,
+  Text,
+  Rect,
+  Group,
+  Transformer,
+} from "react-konva";
 import { Shapes } from "./Shapes";
 import { KonvaEventObject } from "konva/lib/Node";
 import { isShapeSelection, SelectionBox } from "@/lib/isShapeSelection";
 import { ShapeOptions } from "./ShapeOptions";
 import { useMouse } from "@/hooks/useMouse";
+import Konva from "konva";
 
 function CanvasKonva(props: any) {
+  const trRef = useRef<Konva.Transformer>(null);
   const [defaultStyle, setDefaultStyle] = useState<ShapeStyle>({
     fill: "",
     stroke: "white",
@@ -32,9 +42,7 @@ function CanvasKonva(props: any) {
     unselectShapes,
   } = useCanvasStore((state) => state);
   const { isGrabbing } = useGrabbing(currentTool);
-  const { handleMouseWheel, stagePos, stageScale } = useStageScale(); // Зробити onDragEnd, тому що коли міняєш позицію елемента
-  // через перетягування, то координати початкової позиції курсора не змінюються, тому виділення працює криво.
-  // Потрібно поставити нову координату позиції курсора в кінці перетягування.
+  const { handleMouseWheel, stagePos, stageScale } = useStageScale();
 
   const appendShape = (shape: Shape) => {
     addShape(shape);
@@ -56,7 +64,23 @@ function CanvasKonva(props: any) {
   };
 
   const activeShapes = useMemo(() => {
-    return shapes.filter((shape) => shape.selected);
+    const active = shapes.filter((shape) => shape.selected);
+    console.log(active[0]);
+
+    if (trRef.current && active.length > 0) {
+      console.log("active");
+
+      const layer = trRef.current.getLayer();
+
+      trRef.current.nodes(getShapeRefsFromArray(active, layer));
+      trRef.current.getLayer()?.batchDraw();
+    } else if (trRef.current && active.length <= 0) {
+      console.log("deactive");
+
+      trRef.current.nodes([]);
+      trRef.current.getLayer()?.batchDraw();
+    }
+    return active;
   }, [shapes]);
 
   const handleShapeDragEnd = (e: KonvaEventObject<MouseEvent>) => {
@@ -109,6 +133,18 @@ function CanvasKonva(props: any) {
             shapes={shapes}
           />
           <Group ref={groupRef} draggable preventDefault></Group>
+
+          <Transformer // можливо потрібно створити трансформер для кожної фігури в обєкті shapes.
+            ref={trRef}
+            flipEnabled={false}
+            boundBoxFunc={(oldBox, newBox) => {
+              // limit resize
+              if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) {
+                return oldBox;
+              }
+              return newBox;
+            }}
+          />
         </Layer>
         <Layer>
           {
