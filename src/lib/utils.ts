@@ -15,7 +15,6 @@ export function getShapeRefsFromArray(
   for (const shapeProps of shapes) {
     const shape = layer?.findOne(`#${shapeProps.id}`);
     if (shape) shapeRefs.push(shape);
-    console.log("refts", shapeRefs);
   }
   return shapeRefs;
 }

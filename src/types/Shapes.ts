@@ -42,6 +42,8 @@ export interface CommonShape extends Placement2D, NodeOptions {
   type: ShapeType;
   startX: number;
   startY: number;
+  transformedX?: number;
+  transformedY?: number;
 }
 
 export interface ShapeStyle {
@@ -66,6 +68,7 @@ export interface Circle extends CommonShape, ShapeStyle {
 export interface Line extends CommonShape, ShapeStyle {
   type: ShapeType.LINE;
   points: number[];
+  transformedPoints: number[];
 }
 
 export interface Text extends CommonShape, ShapeStyle {

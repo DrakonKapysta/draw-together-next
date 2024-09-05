@@ -1,3 +1,4 @@
+import getShapeTransformedPoints from "@/lib/getShapeTransformedPoints";
 import { CircleHelper, RectHelper } from "@/lib/shapeHelpers";
 import { useCanvasStore } from "@/stores/CanvasStore";
 import { Line as LineType, Shape, ShapeType, Tools } from "@/types/Shapes";
@@ -6,6 +7,7 @@ import { Context } from "konva/lib/Context";
 import { KonvaEventObject } from "konva/lib/Node";
 import React, { FC } from "react";
 import { Ellipse, Line, Rect, Text, Group } from "react-konva";
+import { v4 } from "uuid";
 
 interface ShapeProps {
   currentTool: Tools;
@@ -49,26 +51,13 @@ export const Shapes: FC<ShapeProps> = ({
                 onTransformEnd={(e) => {
                   const node = e.target;
 
-                  const transform = node.getTransform();
-                  const firstPoint = transform.point({
-                    x: (node as Konva.Line).points()[0],
-                    y: (node as Konva.Line).points()[1],
-                  });
-                  const secondPoint = transform.point({
-                    x: (node as Konva.Line).points()[2],
-                    y: (node as Konva.Line).points()[3],
-                  });
+                  const transformedPoints = getShapeTransformedPoints(node);
 
                   updateShape({
-                    id: shape.id,
+                    id: node.attrs.id,
                     x: 0,
                     y: 0,
-                    points: [
-                      firstPoint.x,
-                      firstPoint.y,
-                      secondPoint.x,
-                      secondPoint.y,
-                    ],
+                    ...transformedPoints,
                   });
                 }}
               />
@@ -83,6 +72,15 @@ export const Shapes: FC<ShapeProps> = ({
                 radiusY={shape.radiusY}
                 height={shape.radiusY * 2}
                 width={shape.radiusX * 2}
+                onTransformEnd={(e) => {
+                  const node = e.target;
+
+                  const transformedPoints = getShapeTransformedPoints(node);
+                  updateShape({
+                    id: node.attrs.id,
+                    ...transformedPoints,
+                  });
+                }}
               />
             );
           case "RECTANGLE":
@@ -92,6 +90,12 @@ export const Shapes: FC<ShapeProps> = ({
                 className={className}
                 {...props}
                 hitFunc={RectHelper.createHitBox}
+                onTransformEnd={(e) => {
+                  const node = e.target;
+                  updateShape({
+                    ...node.attrs,
+                  });
+                }}
               />
             );
           case "TEXT":

@@ -145,6 +145,7 @@ export class PencilHelper {
       tension: 0.5,
       x: 0,
       y: 0,
+      transformedPoints: [x1, y1],
     };
   }
 
@@ -179,6 +180,9 @@ export class LineHelper {
       type: ShapeType.LINE,
       x: 0,
       y: 0,
+      transformedX: 0,
+      transformedY: 0,
+      transformedPoints: [x, y, x, y],
     };
   }
   public static updateLine(line: Line, pointerPosition: Vector2d | null) {
@@ -186,6 +190,8 @@ export class LineHelper {
     const { x, y } = pointerPosition;
     line.points[2] = x;
     line.points[3] = y;
+    line.transformedPoints[2] = x;
+    line.transformedPoints[3] = y;
 
     return {
       ...line,

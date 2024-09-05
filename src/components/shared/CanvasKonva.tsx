@@ -22,6 +22,7 @@ import { isShapeSelection, SelectionBox } from "@/lib/isShapeSelection";
 import { ShapeOptions } from "./ShapeOptions";
 import { useMouse } from "@/hooks/useMouse";
 import Konva from "konva";
+import getShapeTransformedPoints from "@/lib/getShapeTransformedPoints";
 
 function CanvasKonva(props: any) {
   const trRef = useRef<Konva.Transformer>(null);
@@ -65,18 +66,13 @@ function CanvasKonva(props: any) {
 
   const activeShapes = useMemo(() => {
     const active = shapes.filter((shape) => shape.selected);
-    console.log(active[0]);
 
     if (trRef.current && active.length > 0) {
-      console.log("active");
-
       const layer = trRef.current.getLayer();
 
       trRef.current.nodes(getShapeRefsFromArray(active, layer));
       trRef.current.getLayer()?.batchDraw();
     } else if (trRef.current && active.length <= 0) {
-      console.log("deactive");
-
       trRef.current.nodes([]);
       trRef.current.getLayer()?.batchDraw();
     }
@@ -89,7 +85,8 @@ function CanvasKonva(props: any) {
     setShapes(
       shapes.map((shape) => {
         if (shape.id === shapeId) {
-          return { ...shape, x: e.target.x(), y: e.target.y() };
+          const points = getShapeTransformedPoints(e.target);
+          return { ...shape, ...points }; //це повинен бути обєкт для універсальності!
         }
         return shape;
       })

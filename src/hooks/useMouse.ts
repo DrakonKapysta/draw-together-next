@@ -73,7 +73,6 @@ export const useMouse = ({
 
     //const pointerPosition = stage.getRelativePointerPosition(); // relative pointer position
     const { x, y } = getRelativePointerPosition(stage);
-    console.log(x, y);
 
     switch (tool) {
       case Tools.Rectangle:
@@ -348,6 +347,7 @@ export const useMouse = ({
     previewLayerRef.current?.batchDraw();
 
     appendShape({ ...shape, ...actions });
+    console.log({ ...shape, ...actions });
 
     shapePreview.current = null;
   };

@@ -14,8 +14,8 @@ export const isShapeSelection = (shape: Shape, selectionBox: SelectionBox) => {
   let y = 0;
   switch (shape.type) {
     case "LINE":
-      x = (shape as Line).points[0] + (shape as Line).x;
-      y = (shape as Line).points[1] + (shape as Line).y;
+      x = (shape as Line).transformedPoints[0];
+      y = (shape as Line).transformedPoints[1];
       break;
     case "RECTANGLE":
       x = (shape as Rectangle).x;

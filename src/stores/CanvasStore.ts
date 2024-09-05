@@ -70,10 +70,11 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
         return {
           shapes: state.shapes.map((shape) => {
             if (shape.id === shapeToUpdate.id) {
+              // console.log(shapeToUpdate.points);
+
               return {
                 ...shape,
                 ...shapeToUpdate,
-                id: v4(),
               };
             }
             return shape;
