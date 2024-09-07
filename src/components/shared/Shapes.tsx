@@ -51,12 +51,13 @@ export const Shapes: FC<ShapeProps> = ({
                 onTransformEnd={(e) => {
                   const node = e.target;
 
+                  console.log("Line transformed");
+
                   const transformedPoints = getShapeTransformedPoints(node);
+                  console.log(transformedPoints);
 
                   updateShape({
                     id: node.attrs.id,
-                    x: 0,
-                    y: 0,
                     ...transformedPoints,
                   });
                 }}
@@ -92,6 +93,7 @@ export const Shapes: FC<ShapeProps> = ({
                 hitFunc={RectHelper.createHitBox}
                 onTransformEnd={(e) => {
                   const node = e.target;
+                  console.log("Rect transformed");
                   updateShape({
                     ...node.attrs,
                   });

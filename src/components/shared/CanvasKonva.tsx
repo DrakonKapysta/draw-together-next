@@ -23,6 +23,7 @@ import { ShapeOptions } from "./ShapeOptions";
 import { useMouse } from "@/hooks/useMouse";
 import Konva from "konva";
 import getShapeTransformedPoints from "@/lib/getShapeTransformedPoints";
+import { group } from "console";
 
 function CanvasKonva(props: any) {
   const trRef = useRef<Konva.Transformer>(null);
@@ -41,6 +42,7 @@ function CanvasKonva(props: any) {
     setShapes,
     selectShapesInArea,
     unselectShapes,
+    updateShape,
   } = useCanvasStore((state) => state);
   const { isGrabbing } = useGrabbing(currentTool);
   const { handleMouseWheel, stagePos, stageScale } = useStageScale();
@@ -130,7 +132,66 @@ function CanvasKonva(props: any) {
             shapes={shapes}
             trRef={trRef}
           />
-          <Group ref={groupRef} draggable preventDefault></Group>
+          <Group
+            ref={groupRef}
+            draggable
+            type={ShapeType.GROUP}
+            preventDefault
+            onDragEnd={(e) => {
+              const groupedShapes = groupRef.current?.getChildren();
+
+              const groupTransformedPoints = getShapeTransformedPoints(
+                e.target
+              ) as { x: number; y: number };
+
+              groupedShapes?.forEach((shape) => {
+                switch (shape.attrs.type) {
+                  case ShapeType.LINE:
+                    if (
+                      shape.attrs.type === ShapeType.LINE &&
+                      shape.attrs.points.length === 4
+                    ) {
+                      let transformedPoints = (
+                        getShapeTransformedPoints(shape) as {
+                          transformedPoints: number[];
+                        }
+                      ).transformedPoints;
+                      transformedPoints = [
+                        transformedPoints[0] + groupTransformedPoints.x,
+                        transformedPoints[1] + groupTransformedPoints.y,
+                        transformedPoints[2] + groupTransformedPoints.x,
+                        transformedPoints[3] + groupTransformedPoints.y,
+                      ];
+
+                      updateShape({
+                        id: shape.attrs.id,
+                        transformedPoints,
+                      });
+                    } else {
+                      let transformedPoints = (
+                        getShapeTransformedPoints(shape) as {
+                          transformedPoints: number[];
+                        }
+                      )?.transformedPoints;
+                      transformedPoints = [
+                        transformedPoints[0] + groupTransformedPoints?.x,
+                        transformedPoints[1] + groupTransformedPoints?.y,
+                      ];
+
+                      updateShape({
+                        id: shape.attrs.id,
+                        transformedPoints,
+                      });
+                    }
+
+                    break;
+
+                  case ShapeType.CIRCLE:
+                    break;
+                }
+              });
+            }}
+          ></Group>
 
           <Transformer // можливо потрібно створити трансформер для кожної фігури в обєкті shapes.
             ref={trRef}

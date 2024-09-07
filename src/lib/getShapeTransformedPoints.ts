@@ -3,18 +3,19 @@ import Konva from "konva";
 
 export default function (node: Konva.Node) {
   const transform = node.getTransform();
+  let point = null;
 
   switch (node.attrs.type) {
+    case ShapeType.GROUP:
+      point = transform.getTranslation();
+      return { x: point.x, y: point.y };
     case ShapeType.CIRCLE:
-      const point = node.getAbsolutePosition();
-
-      console.log(point);
+      point = transform.getTranslation();
 
       return { x: point.x, y: point.y };
-      break;
 
     case ShapeType.RECTANGLE:
-      const { x, y } = node.getAbsolutePosition();
+      const { x, y } = transform.getTranslation();
       return { x, y };
 
     case ShapeType.LINE:
@@ -27,6 +28,7 @@ export default function (node: Konva.Node) {
           x: (node as Konva.Line).points()[2],
           y: (node as Konva.Line).points()[3],
         });
+
         return {
           transformedPoints: [
             firstPoint.x,
@@ -45,6 +47,5 @@ export default function (node: Konva.Node) {
           transformedPoints: [firstPoint.x, firstPoint.y],
         };
       }
-      break;
   }
 }
