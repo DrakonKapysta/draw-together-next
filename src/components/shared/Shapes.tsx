@@ -1,13 +1,11 @@
 import getShapeTransformedPoints from "@/lib/getShapeTransformedPoints";
-import { CircleHelper, RectHelper } from "@/lib/shapeHelpers";
+import { RectHelper } from "@/lib/shapeHelpers";
 import { useCanvasStore } from "@/stores/CanvasStore";
-import { Line as LineType, Shape, ShapeType, Tools } from "@/types/Shapes";
+import { Shape, ShapeType, Tools } from "@/types/Shapes";
 import Konva from "konva";
-import { Context } from "konva/lib/Context";
 import { KonvaEventObject } from "konva/lib/Node";
 import React, { FC } from "react";
 import { Ellipse, Line, Rect, Text, Group } from "react-konva";
-import { v4 } from "uuid";
 
 interface ShapeProps {
   currentTool: Tools;
@@ -33,7 +31,7 @@ export const Shapes: FC<ShapeProps> = ({
     <>
       {shapes.map((shape) => {
         const activeProps = shape.selected
-          ? // ? { shadowColor: "red", shadowBlur: 20, shadowOpacity: 100 }
+          ? // ? { shadowColor: "red", shadowBlur: 20, shadowOpacity: 100 } can add some selections styles.
             {}
           : {};
         const props = { ...activeProps, ...shape, ...options };
@@ -51,10 +49,7 @@ export const Shapes: FC<ShapeProps> = ({
                 onTransformEnd={(e) => {
                   const node = e.target;
 
-                  console.log("Line transformed");
-
                   const transformedPoints = getShapeTransformedPoints(node);
-                  console.log(transformedPoints);
 
                   updateShape({
                     id: node.attrs.id,
@@ -93,7 +88,6 @@ export const Shapes: FC<ShapeProps> = ({
                 hitFunc={RectHelper.createHitBox}
                 onTransformEnd={(e) => {
                   const node = e.target;
-                  console.log("Rect transformed");
                   updateShape({
                     ...node.attrs,
                   });

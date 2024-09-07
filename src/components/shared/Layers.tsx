@@ -44,7 +44,6 @@ export const Layers: FC<LayerProps> = ({ activeShapes, groupRef }) => {
   );
   const handleLayer = (layerOption: LayersOptions) => {
     if (selectedShapesCount > 1) {
-      console.log("groud");
       if (groupRef.current) handleGroupLayering(groupRef.current, layerOption);
     } else {
       handleShapeLayering(activeShapes, layerOption);

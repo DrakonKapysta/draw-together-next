@@ -1,5 +1,3 @@
-import Konva from "konva";
-
 export enum Tools {
   Grab = "Grab",
   MousePointer = "MousePointer",

@@ -21,8 +21,6 @@ export class RectHelper {
   ) {
     if (!pointerPosition) return;
 
-    console.log(pointerPosition);
-
     return {
       ...defaultStyles,
       id: uuidv4(),
@@ -168,7 +166,6 @@ export class LineHelper {
   ) {
     if (!pointerPosition) return;
     const { x, y } = pointerPosition;
-    console.log(x, y);
 
     return {
       ...defaultStyles,

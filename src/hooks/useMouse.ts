@@ -69,8 +69,6 @@ export const useMouse = ({
       return;
     }
 
-    //console.log(event.target);
-
     //const pointerPosition = stage.getRelativePointerPosition(); // relative pointer position
     const { x, y } = getRelativePointerPosition(stage);
 
@@ -347,7 +345,6 @@ export const useMouse = ({
     previewLayerRef.current?.batchDraw();
 
     appendShape({ ...shape, ...actions });
-    console.log({ ...shape, ...actions });
 
     shapePreview.current = null;
   };

@@ -1,29 +1,17 @@
 "use client";
 import { useGrabbing } from "@/hooks/useGrabbing";
-import { useMouseArea } from "@/hooks/useMouseArea";
 import { useStageScale } from "@/hooks/useStageScale";
-import { useTool } from "@/hooks/useTool";
 import { cn, getShapeRefsFromArray } from "@/lib/utils";
 import { useCanvasStore } from "@/stores/CanvasStore";
 import { Shape, ShapeStyle, ShapeType, Tools } from "@/types/Shapes";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Stage,
-  Layer,
-  Circle,
-  Text,
-  Rect,
-  Group,
-  Transformer,
-} from "react-konva";
+import { useMemo, useRef, useState } from "react";
+import { Stage, Layer, Rect, Group, Transformer } from "react-konva";
 import { Shapes } from "./Shapes";
 import { KonvaEventObject } from "konva/lib/Node";
-import { isShapeSelection, SelectionBox } from "@/lib/isShapeSelection";
 import { ShapeOptions } from "./ShapeOptions";
 import { useMouse } from "@/hooks/useMouse";
 import Konva from "konva";
 import getShapeTransformedPoints from "@/lib/getShapeTransformedPoints";
-import { group } from "console";
 
 function CanvasKonva(props: any) {
   const trRef = useRef<Konva.Transformer>(null);
@@ -88,7 +76,7 @@ function CanvasKonva(props: any) {
       shapes.map((shape) => {
         if (shape.id === shapeId) {
           const points = getShapeTransformedPoints(e.target);
-          return { ...shape, ...points }; //це повинен бути обєкт для універсальності!
+          return { ...shape, ...points };
         }
         return shape;
       })
@@ -193,11 +181,10 @@ function CanvasKonva(props: any) {
             }}
           ></Group>
 
-          <Transformer // можливо потрібно створити трансформер для кожної фігури в обєкті shapes.
+          <Transformer
             ref={trRef}
             flipEnabled={false}
             boundBoxFunc={(oldBox, newBox) => {
-              // limit resize
               if (Math.abs(newBox.width) < 5 || Math.abs(newBox.height) < 5) {
                 return oldBox;
               }
