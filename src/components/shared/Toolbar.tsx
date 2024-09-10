@@ -1,4 +1,5 @@
 "use client";
+import { useLoading } from "@/context/LoadingContext";
 import { useTool } from "@/hooks/useTool";
 import { cn } from "@/lib/utils";
 import { useCanvasStore } from "@/stores/CanvasStore";
@@ -8,7 +9,6 @@ import {
   MousePointer,
   Pencil,
   Square,
-  LetterText,
   Hand,
   Minus,
 } from "lucide-react";
@@ -49,37 +49,46 @@ const options = [
 
 export default function Toolbar({ className }: { className?: string }) {
   const { currentTool, changeTool, unselectShapes } = useTool();
+  const { isLoading } = useLoading();
+  const isMouseDown = useCanvasStore((state) => state.isMouseDown);
 
   return (
-    <menu
-      className={cn(
-        "absolute left-1/2 -translate-x-1/2 flex items-center h-12 pl-1 z-10",
-        className
+    <>
+      {!isLoading && (
+        <menu
+          className={cn(
+            "absolute left-1/2 -translate-x-1/2 flex items-center h-12 pl-1 z-10",
+            `${isMouseDown ? "pointer-events-none" : "pointer-events-auto"}`,
+            className
+          )}
+        >
+          <div className="flex items-center justify-center gap-2 h-full rounded-lg bg-[#232329] px-4">
+            {options.map((option, index) => (
+              <button
+                key={option.id}
+                onClick={() => {
+                  unselectShapes();
+                  changeTool(option.id);
+                }}
+                className={cn(
+                  `flex items-center justify-center h-10 w-10 rounded-lg border-solid relative ${
+                    option.props?.disabled && "opacity-50"
+                  }`,
+                  currentTool === option.id
+                    ? "bg-[#403E6A]"
+                    : "hover:bg-[#31303B]"
+                )}
+                {...option.props}
+              >
+                {option.icon}
+                <span className="absolute right-1 bottom-1 text-xs/[10px] text-white/50">
+                  {index + 1}
+                </span>
+              </button>
+            ))}
+          </div>
+        </menu>
       )}
-    >
-      <div className="flex items-center justify-center gap-2 h-full rounded-lg bg-[#232329] px-4">
-        {options.map((option, index) => (
-          <button
-            key={option.id}
-            onClick={() => {
-              unselectShapes();
-              changeTool(option.id);
-            }}
-            className={cn(
-              `flex items-center justify-center h-10 w-10 rounded-lg border-solid relative ${
-                option.props?.disabled && "opacity-50"
-              }`,
-              currentTool === option.id ? "bg-[#403E6A]" : "hover:bg-[#31303B]"
-            )}
-            {...option.props}
-          >
-            {option.icon}
-            <span className="absolute right-1 bottom-1 text-xs/[10px] text-white/50">
-              {index + 1}
-            </span>
-          </button>
-        ))}
-      </div>
-    </menu>
+    </>
   );
 }

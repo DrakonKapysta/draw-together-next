@@ -4,7 +4,7 @@ import { useStageScale } from "@/hooks/useStageScale";
 import { cn, getShapeRefsFromArray } from "@/lib/utils";
 import { useCanvasStore } from "@/stores/CanvasStore";
 import { Shape, ShapeStyle, ShapeType, Tools } from "@/types/Shapes";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Stage, Layer, Rect, Group, Transformer } from "react-konva";
 import { Shapes } from "./Shapes";
 import { KonvaEventObject } from "konva/lib/Node";
@@ -12,9 +12,11 @@ import { ShapeOptions } from "./ShapeOptions";
 import { useMouse } from "@/hooks/useMouse";
 import Konva from "konva";
 import getShapeTransformedPoints from "@/lib/getShapeTransformedPoints";
+import { useLoading } from "@/context/LoadingContext";
 
 function CanvasKonva(props: any) {
   const trRef = useRef<Konva.Transformer>(null);
+  const { setLoading } = useLoading();
   const [defaultStyle, setDefaultStyle] = useState<ShapeStyle>({
     fill: "",
     stroke: "white",
@@ -83,12 +85,17 @@ function CanvasKonva(props: any) {
     );
   };
 
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
   return (
     <>
       {(currentTool === Tools.MousePointer && activeShapes.length > 0) ||
       (currentTool !== Tools.MousePointer && currentTool !== Tools.Grab) ? (
         <ShapeOptions
           activeShapes={activeShapes}
+          tool={currentTool}
           onApplyStyles={onApplyStyles}
           style={defaultStyle}
           onStyleChange={(style: Partial<ShapeStyle>) =>

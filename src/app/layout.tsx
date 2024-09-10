@@ -3,6 +3,7 @@ import { Inter, Nunito } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Header from "@/components/shared/Header";
+import { LoadingProvider } from "@/context/LoadingContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const nunito = Nunito({
@@ -25,10 +26,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="overflow-hidden">
-        <Header />
-        <main className={cn("min-h-screen  bg-[#121212]", nunito.className)}>
-          {children}
-        </main>
+        <LoadingProvider>
+          <Header />
+          <main className={cn("min-h-screen bg-[#121212]", nunito.className)}>
+            {children}
+          </main>
+        </LoadingProvider>
       </body>
     </html>
   );

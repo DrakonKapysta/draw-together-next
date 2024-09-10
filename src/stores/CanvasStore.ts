@@ -26,6 +26,8 @@ interface CanvasState {
   resetSelectedShapesCount: () => void;
   trRef: RefObject<Konva.Transformer> | undefined;
   setTrRef: (ref: React.RefObject<Konva.Transformer>) => void;
+  isMouseDown: boolean;
+  setIsMouseDown: (isMouseDown: boolean) => void;
 }
 
 export const useCanvasStore = create<CanvasState>()((set) => ({
@@ -35,6 +37,8 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
   selectedShapesCount: 0,
   isGroup: false,
   trRef: undefined,
+  isMouseDown: false,
+  setIsMouseDown: (isMouseDown: boolean) => set({ isMouseDown }),
   changeTool: (tool: Tools) =>
     set(
       produce((state) => {
@@ -70,8 +74,6 @@ export const useCanvasStore = create<CanvasState>()((set) => ({
         return {
           shapes: state.shapes.map((shape) => {
             if (shape.id === shapeToUpdate.id) {
-              // console.log(shapeToUpdate.points);
-
               return {
                 ...shape,
                 ...shapeToUpdate,

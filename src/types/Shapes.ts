@@ -14,6 +14,7 @@ export enum ShapeType {
   RECTANGLE = "RECTANGLE",
   TEXT = "TEXT",
   GROUP = "GROUP",
+  COMMON = "COMMON",
 }
 
 export interface Placement2D {

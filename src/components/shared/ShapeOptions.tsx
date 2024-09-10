@@ -1,11 +1,12 @@
-import { cn } from "@/lib/utils";
-import { Shape, ShapeStyle } from "@/types/Shapes";
+import { Shape, ShapeStyle, ShapeType, Tools } from "@/types/Shapes";
 
-import { useState } from "react";
 import { Layers } from "./Layers";
 import ShapeActions from "./ShapeActions";
 import Konva from "konva";
-import { useCanvasStore } from "@/stores/CanvasStore";
+import { RectStyles } from "./RectStyles";
+import React, { useEffect, useState } from "react";
+import renderShapeStyles from "@/lib/renderShapeStyles";
+import { CommonStyles } from "./CommonStyles";
 
 interface ShapeOptionsProps {
   style: ShapeStyle;
@@ -13,100 +14,52 @@ interface ShapeOptionsProps {
   onStyleChange: (styles: Partial<ShapeStyle>) => void;
   groupRef: React.RefObject<Konva.Group>;
   activeShapes: Shape[];
+  tool: Tools;
 }
-
-const strokeColors = ["#ffffff", "#ff8383", "#3a994c", "#56a2e8"];
-const backgroundColors = [...strokeColors, ""];
-const cornerRadius = [0, 5, 10, 100];
 
 export const ShapeOptions = ({
   style,
+  tool,
   onApplyStyles,
   onStyleChange,
   activeShapes,
   groupRef,
 }: ShapeOptionsProps) => {
-  const [activeButton, setActiveButton] = useState<{
-    defaultCssProp: string;
-    index: number;
-  } | null>(null);
-  const isGroup = useCanvasStore((state) => state.isGroup);
+  const activeTypes = React.useRef<Set<ShapeType>>(new Set());
 
-  const clickButtonHandler = (
-    activeButton: {
-      defaultCssProp: string;
-      index: number;
-    },
-    styles: Partial<ShapeStyle>
-  ) => {
+  useEffect(() => {
+    activeTypes.current.clear();
+    activeTypes.current.add(ShapeType.COMMON);
+
+    activeShapes
+      .map((s) => s.type)
+      .forEach((t) => {
+        activeTypes.current.add(t);
+      });
+  }, [activeShapes]);
+
+  const clickButtonHandler = (styles: Partial<ShapeStyle>) => {
     onApplyStyles(styles);
     onStyleChange(styles);
-    setActiveButton(activeButton);
   };
 
-  const options: {
-    title: string;
-    options: ShapeStyle[keyof ShapeStyle][];
-    key: keyof ShapeStyle;
-    type: "color" | "text";
-    defaultCssProp: string;
-  }[] = [
-    {
-      title: "Background",
-      options: backgroundColors,
-      key: "fill",
-      type: "color",
-      defaultCssProp: "backgroundColor",
-    },
-    {
-      title: "Stroke",
-      options: strokeColors,
-      key: "stroke",
-      type: "color",
-      defaultCssProp: "borderColor",
-    },
-    {
-      title: "Corner radius",
-      options: cornerRadius,
-      key: "cornerRadius",
-      type: "text",
-      defaultCssProp: "borderRadius",
-    },
-  ];
   return (
     <aside className="absolute top-1/2 -translate-y-1/2 left-2 rounded z-30 bg-[#232329] max-w-44 px-3 py-2">
       <section className="flex flex-col gap-2">
-        {options.map((option) => (
-          <div key={option.title}>
-            <b className="text-white mb-2 block">{option.title}</b>
-            <div className="flex gap-2">
-              {option.options.map((opt, index) => (
-                <button
-                  key={index}
-                  style={{
-                    backgroundColor: `${opt}50`,
-                    borderColor:
-                      activeButton?.defaultCssProp === option.defaultCssProp &&
-                      activeButton.index === index
-                        ? "white"
-                        : "",
-                    [option.defaultCssProp]: opt === "" ? "" : opt,
-                  }}
-                  className={cn(
-                    `min-w-6 min-h-6 rounded border `,
-                    `${opt === "" && "transparent-background"}`
-                  )}
-                  onClick={() =>
-                    clickButtonHandler(
-                      { index, defaultCssProp: option.defaultCssProp },
-                      { [option.key]: opt }
-                    )
-                  }
-                ></button>
-              ))}
-            </div>
-          </div>
-        ))}
+        {activeShapes.length > 0 ? (
+          Array.from(activeTypes.current).map((type, index) => {
+            return (
+              <React.Fragment key={type + index}>
+                {renderShapeStyles(type, tool, clickButtonHandler)}
+              </React.Fragment>
+            );
+          })
+        ) : (
+          <React.Fragment>
+            <CommonStyles onClick={clickButtonHandler} />
+            {renderShapeStyles(null, tool, clickButtonHandler)}
+          </React.Fragment>
+        )}
         <Layers groupRef={groupRef} activeShapes={activeShapes} />
         <ShapeActions />
       </section>

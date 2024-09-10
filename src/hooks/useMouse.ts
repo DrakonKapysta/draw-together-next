@@ -44,23 +44,24 @@ export const useMouse = ({
   const [selectedArea, setSelectedArea] = useState<any>(initialSelectedArea);
   const shapePreview = useRef<any>(null);
   const previewLayerRef = useRef<Konva.Layer | null>(null);
-  const mouseDown = useRef(false);
+  //const mouseDown = useRef(false);
   const shapesSelecting = useRef(false);
   const groupRef = useRef<Konva.Group | null>(null);
   const {
     shapes,
     deleteSelectedShapes,
-    deleteShape,
     selectedShapesCount,
     isGroup,
     setIsGroup,
-    setShapes,
     unselectShapes,
     resetSelectedShapesCount,
+    setIsMouseDown,
+    isMouseDown,
   } = useCanvasStore((state) => state);
 
   const onMouseDown = (event: KonvaEventObject<MouseEvent>) => {
-    mouseDown.current = true;
+    //mouseDown.current = true;
+    setIsMouseDown(true);
 
     if (tool === Tools.Grab) return;
 
@@ -221,7 +222,7 @@ export const useMouse = ({
   };
 
   const onMouseMove = (event: KonvaEventObject<MouseEvent>) => {
-    if (!mouseDown.current) {
+    if (!isMouseDown) {
       return;
     }
 
@@ -302,7 +303,7 @@ export const useMouse = ({
                 }
               }
               for (const shape of selectedShapes) {
-                groupRef.current?.add(shape);
+                groupRef.current?.add(shape as Konva.Shape);
               }
             }
           }
@@ -312,7 +313,8 @@ export const useMouse = ({
   };
 
   const onMouseUp = (event: KonvaEventObject<MouseEvent>) => {
-    mouseDown.current = false;
+    setIsMouseDown(false);
+    //mouseDown.current = false;
 
     if (tool === Tools.Grab) return;
     if (tool === Tools.MousePointer) {
